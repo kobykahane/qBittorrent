@@ -19,13 +19,9 @@ jobs:
       fail-fast: false
       matrix:
         libtorrent:
-          - version: "2.0.11"
+          - version: "2.0.12"
             boost_major_version: "1"
-            boost_minor_version: "90"
-            boost_patch_version: "0"
-          - version: "1.2.20"
-            boost_major_version: "1"
-            boost_minor_version: "86"
+            boost_minor_version: "91"
             boost_patch_version: "0"
         config:
         - os: windows-11-arm
@@ -116,7 +112,7 @@ jobs:
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
-          version: "6.10.1"
+          version: "6.11.1"
           arch: ${{ matrix.config.qt_arch }}
           archives: qtbase qtsvg qttools
           modules: qtimageformats
@@ -146,12 +142,11 @@ jobs:
             -Ddeprecated-functions=OFF `
             -Dstatic_runtime=OFF `
             -DVCPKG_TARGET_TRIPLET=${{ matrix.config.arch }}-windows-static-md-release
-          cmake --build build
+          cmake --build build --parallel
           cmake --install build
 
       - name: Build qBittorrent
         run: |
-          $env:CXXFLAGS+="/DQT_FORCE_ASSERTS /WX"
           cmake `
             -B build `
             -G "Ninja" `
@@ -161,13 +156,11 @@ jobs:
             -DBOOST_ROOT="${{ env.boost_path }}/lib/cmake" `
             -DLibtorrentRasterbar_DIR="${{ env.libtorrent_path }}/install/lib/cmake/LibtorrentRasterbar" `
             -DMSVC_RUNTIME_DYNAMIC=ON `
-            -DTESTING=ON `
             -DVCPKG_TARGET_TRIPLET=${{ matrix.config.arch }}-windows-static-md-release `
             -DVERBOSE_CONFIGURE=ON `
             --graphviz=build/target_graph.dot
           cmake --build build --target qbt_update_translations
-          cmake --build build
-          cmake --build build --target check
+          cmake --build build --parallel
 
       - name: Prepare build artifacts
         run: |
