@@ -19,10 +19,9 @@ jobs:
       fail-fast: false
       matrix:
         libtorrent:
-          - version: "2.0.13"
-            # v2.0.13 + fix for use-after-free in uTP failure socket shutdown
+          - version: "2.0.15"
+            # Includes the fix for use-after-free in uTP failure socket shutdown
             # path (arvidn/libtorrent#8528)
-            ref: "507c60005b4f36f82c4ee8473fa6acfab392844a"
             boost_major_version: "1"
             boost_minor_version: "91"
             boost_patch_version: "0"
@@ -123,12 +122,13 @@ jobs:
 
       - name: Install libtorrent
         run: |
-          git init ${{ env.libtorrent_path }}
+          git clone `
+            --branch v${{ matrix.libtorrent.version }} `
+            --depth 1 `
+            --recurse-submodules `
+            https://github.com/arvidn/libtorrent.git `
+            ${{ env.libtorrent_path }}
           cd ${{ env.libtorrent_path }}
-          git remote add origin https://github.com/arvidn/libtorrent.git
-          git fetch --depth 1 origin ${{ matrix.libtorrent.ref }}
-          git checkout FETCH_HEAD
-          git submodule update --init --recursive --depth 1
           $env:CXXFLAGS+=" /guard:cf"
           $env:LDFLAGS+=" /GUARD:CF"
           cmake `
