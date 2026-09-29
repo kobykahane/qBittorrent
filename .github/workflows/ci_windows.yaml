@@ -23,7 +23,7 @@ jobs:
             # Includes the fix for use-after-free in uTP failure socket shutdown
             # path (arvidn/libtorrent#8528)
             boost_major_version: "1"
-            boost_minor_version: "91"
+            boost_minor_version: "92"
             boost_patch_version: "0"
         config:
         - os: windows-11-arm
@@ -114,7 +114,7 @@ jobs:
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
-          version: "6.11.1"
+          version: "6.11.2"
           arch: ${{ matrix.config.qt_arch }}
           archives: qtbase qtsvg qttools
           modules: qtimageformats
